@@ -1,0 +1,26 @@
+services:
+  worklog:
+    build: .
+    image: worklog:latest
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:${PORT:-8000}:8000"
+    volumes:
+      - worklog-data:/data
+
+  # Optional: publish through a Cloudflare Tunnel (e.g. worklog.zeegly.tech).
+  # Start with:  docker compose --profile tunnel up -d
+  # In the Cloudflare dashboard, point the tunnel's public hostname at http://worklog:8000
+  cloudflared:
+    image: cloudflare/cloudflared:2024.12.2
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set TUNNEL_TOKEN in .env}
+    depends_on:
+      - worklog
+
+volumes:
+  worklog-data:
