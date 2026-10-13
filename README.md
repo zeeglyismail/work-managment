@@ -30,7 +30,7 @@ you finish. Times are recorded once and never change.
 | Backend  | FastAPI, SQLAlchemy 2                                |
 | Database | SQLite (a single file in a Docker volume)            |
 | PDF      | reportlab                                            |
-| Deploy   | One Docker image + an optional Cloudflare Tunnel     |
+| Deploy   | One Docker image (Docker Compose)                    |
 
 ## Run with Docker
 
@@ -39,21 +39,12 @@ cp .env.example .env      # then set APP_PASSWORD, SECRET_KEY, OWNER_NAME
 docker compose up -d --build
 ```
 
-Open http://localhost:8000.
+Open http://localhost:9001.
 
 If you are testing over plain HTTP from another machine, set `COOKIE_SECURE=false`.
 Otherwise the browser won't keep the session cookie.
 
-### Publishing on a domain (Cloudflare Tunnel)
-
-1. In Cloudflare Zero Trust, create a tunnel and copy its token into `TUNNEL_TOKEN` in `.env`.
-2. Add a public hostname, e.g. `worklog.zeegly.tech`, with the service set to `http://worklog:8000`.
-3. Start the app with the tunnel:
-   ```bash
-   docker compose --profile tunnel up -d --build
-   ```
-
-The app port is bound to `127.0.0.1` only. Public traffic arrives through the tunnel.
+The port is bound to `127.0.0.1:9001` only. Put your own reverse proxy or tunnel in front of it.
 
 ### Backups
 
@@ -76,8 +67,7 @@ docker compose cp worklog:/data ./backup-$(date +%F)
 | `OWNER_NAME`    | empty          | Name printed on the PDF reports                      |
 | `TZ_NAME`       | `Asia/Dhaka`   | Timezone for "today", the timer and reports          |
 | `COOKIE_SECURE` | `false`        | Set to `true` when served over HTTPS                 |
-| `PORT`          | `8000`         | Host port (bound to localhost)                       |
-| `TUNNEL_TOKEN`  | empty          | Cloudflare Tunnel token (`tunnel` profile)           |
+| `PORT`          | `9001`         | Host port (bound to localhost)                       |
 
 ## Local development
 
