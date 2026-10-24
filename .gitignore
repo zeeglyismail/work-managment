@@ -1,6 +1,7 @@
 .env
 data/
 *.xlsx
+!sheet/Work_Log_Backup.xlsx
 
 # Python
 __pycache__/
